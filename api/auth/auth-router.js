@@ -1,9 +1,14 @@
 const router = require('express').Router();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+const User = require("../users/users-model")
+const { BCRYPT_ROUNDS, JWT_SECRET } = require('../../config/index');
 
 router.post('/register', (req, res) => {
   res.end('implement register, please!');
   /*
-    IMPLEMENT
+    IMPLEMENT 
     You are welcome to build additional middlewares to help with the endpoint's functionality.
     DO NOT EXCEED 2^8 ROUNDS OF HASHING!
 
@@ -27,6 +32,18 @@ router.post('/register', (req, res) => {
     4- On FAILED registration due to the `username` being taken,
       the response body should include a string exactly as follows: "username taken".
   */
+      let user = req.body
+
+      // bcrypting the password before saving
+      const hash = bcrypt.hashSync(user.password, BCRYPT_ROUNDS)
+      // never save the plain text password in the db
+      user.password = hash;
+      User.add(user)
+        .then(saved => {
+          res.status(201).json({ message: `Great to have you, ${saved.username}` })
+        })
+        // .catch(next) // our custom err handling middleware in server.js will trap this
+    
 });
 
 router.post('/login', (req, res) => {
