@@ -90,7 +90,10 @@ router.post('/login', (req, res) => {
     .then(([user]) => {
       if (user && bcrypt.compareSync(password, user.password)) {
         const token = generateToken(user);
-        res.status(200).json({ message: `welcome, ${user.username}`, token })
+        res.status(200).json({ 
+          message: `welcome, ${user.username}`, 
+          token 
+        })
       } 
       // else {
       //   next({ status: 401, message: 'Invalid Credentials' })
@@ -101,7 +104,6 @@ router.post('/login', (req, res) => {
 function generateToken(user) {
   const payload = {
     sub: user.id,
-    role: user.role,
     username: user.username,
   };
   const options = { expiresIn: '1d' };
