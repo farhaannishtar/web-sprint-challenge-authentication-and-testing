@@ -5,8 +5,8 @@ const jwt = require('jsonwebtoken');
 const User = require("../users/users-model")
 const { BCRYPT_ROUNDS, JWT_SECRET } = require('../../config/index');
 
-router.post('/register', (req, res) => {
-  res.end('implement register, please!');
+router.post('/register', async (req, res) => {
+  // res.end('implement register, please!');
   /*
     IMPLEMENT 
     You are welcome to build additional middlewares to help with the endpoint's functionality.
@@ -34,13 +34,21 @@ router.post('/register', (req, res) => {
   */
       let user = req.body
 
+      let { username, password } = req.body;
+
+      let alreadyExists = await User.findBy({ username }).first() != null;
+      if (alreadyExists) {
+          res.status(400).json({message: "username taken"})
+          return;
+      }
+
       // bcrypting the password before saving
       const hash = bcrypt.hashSync(user.password, BCRYPT_ROUNDS)
       // never save the plain text password in the db
       user.password = hash;
       User.add(user)
-        .then(saved => {
-          res.status(201).json({saved})
+        .then(savedUser => {
+          res.status(201).json(savedUser)
         })
         // .catch(next) // our custom err handling middleware in server.js will trap this
     
