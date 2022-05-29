@@ -36,6 +36,10 @@ router.post('/register', async (req, res) => {
 
       let { username, password } = req.body;
 
+      if (!username || !password) {
+        res.status(400).json({message: "username and password required"})
+      }
+
       let alreadyExists = await User.findBy({ username }).first() != null;
       if (alreadyExists) {
           res.status(400).json({message: "username taken"})
