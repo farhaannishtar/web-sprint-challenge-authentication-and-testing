@@ -85,6 +85,10 @@ router.post('/login', (req, res) => {
       the response body should include a string exactly as follows: "invalid credentials".
   */
   let { username, password } = req.body
+  if (!username || !password) {
+    res.status(400).json({message: "username and password required"})
+    return;
+  }
 
   User.findBy({ username })
     .then(([user]) => {
@@ -94,10 +98,9 @@ router.post('/login', (req, res) => {
           message: `welcome, ${user.username}`, 
           token 
         })
-      } 
-      // else {
-      //   next({ status: 401, message: 'Invalid Credentials' })
-      // }
+      } else {
+        res.status(401).json({message: "invalid credentials"})
+      }
     })
 });
 
