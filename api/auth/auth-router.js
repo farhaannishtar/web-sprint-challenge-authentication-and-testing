@@ -40,7 +40,7 @@ router.post('/register', (req, res) => {
       user.password = hash;
       User.add(user)
         .then(saved => {
-          res.status(201).json({ message: `Great to have you, ${saved.username}` })
+          res.status(201).json({saved})
         })
         // .catch(next) // our custom err handling middleware in server.js will trap this
     
