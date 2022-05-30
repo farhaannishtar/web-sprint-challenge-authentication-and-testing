@@ -1,4 +1,26 @@
-module.exports = (req, res, next) => {
+const Users = require('../users/users-model');
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = require('../../config');
+
+module.exports = async (req, res, next) => {
+  console.log("Move on! Don't trip over a girl. There is an ocean of them out there. Abundance Mindset")
+  
+  if (req.headers.authorization === null) {
+    res.status(401).json({message: 'token required' });
+    return;
+  }
+
+  try {
+    req.decodedJwt = await jwt.verify(req.headers.authorization, JWT_SECRET);
+    let user = await Users.findById(req.decodedJwt.sub);
+    if(req.decodedJwt.iat < user.logout_time) {
+      res.status(401).json({message: 'token invalid' });
+      return;
+    }
+  } catch(err) {
+    return;
+  }
+
   next();
   /*
     IMPLEMENT
