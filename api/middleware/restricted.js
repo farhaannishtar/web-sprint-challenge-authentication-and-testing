@@ -13,17 +13,18 @@ module.exports = async (req, res, next) => {
     return;
   }
 
-  // try {
-  //   req.decodedJwt = await jwt.verify(req.headers.authorization, JWT_SECRET);
-  //   let user = await Users.findById(req.decodedJwt.sub);
-  //   if(req.decodedJwt.iat < user.logout_time) {
-  //     next({ status: 401, message: 'token invalid' });
-  //     return;
-  //   }
-  // } catch(err) {
-  //   // next({ status: 401, message: 'this endpoint is restricted' });
-  //   return;
-  // }
+  try {
+    req.decodedJwt = await jwt.verify(req.headers.authorization, JWT_SECRET);
+    let user = await Users.findById(req.decodedJwt.sub);
+    if(!user) {
+      // next({ status: 401, message: 'token invalid' });
+      res.status(401).json({message: "token invalid"})
+      return;
+    }
+  } catch(err) {
+    // next({ status: 401, message: 'this endpoint is restricted' });
+    return;
+  }
 
   next();
   /*
