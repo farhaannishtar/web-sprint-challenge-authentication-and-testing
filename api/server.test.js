@@ -25,7 +25,13 @@ afterAll(async () => {
 
 
 describe('server.js', () => {
+  /* 
+    Testing POST request to register a new User
+    Testing POST request for a registered User to login   
+    Testing GET request for an authenticated User with a JWT token to Access jokes endpoint
+  */
   describe('Endpoints for Authentication', () => {
+    // Testing the endpoint to Register Users
     describe('POST Request for /api/auth/register', () => {
       beforeEach(async () => {
         await db('users').truncate()
@@ -50,15 +56,18 @@ describe('server.js', () => {
         expect(body.password).toMatch(/^\$2[ayb]\$.{56}$/)
       })
     })
+    // Testing the endpoint to Login Users
     describe('POST Request for /api/auth/login', () => {
       beforeEach(async () => {
         await db('users').truncate()
         await request(server).post('/api/auth/register').send(userThree)
       })
+      // Testing the HTTP Status code on a login attempt with invalid credentials
       it('Responds with a 401 status code error when client provides no credentials or invalid credentials.', async () => {
         const response = await request(server).post('/api/auth/login').send(userFour);
         expect(response.status).toBe(401);
       })
+      // Testing the HTTP Status code on a successful Login  
       it('Responds with the proper status code 200 upon successful login', async () => {
         const response = await request(server).post('/api/auth/login').send(userThree);
         expect(response.status).toBe(200);
@@ -67,16 +76,19 @@ describe('server.js', () => {
   })
 })
 
+// Testing the endpoint for authenticated Users to access jokes 
 describe('Jokes endpoint', () => {
   describe('GET Request for /api/jokes', () => {
     beforeEach(async () => {
       await db('users').truncate()
       await request(server).post('/api/auth/register').send(userFive)
     })
+    // Testing error status code given upon missing token
     it('responds with an error status code on missing token', async () => {
       const response = await request(server).get('/api/jokes')
       expect(response.status + '').toMatch(/4|5/)
     })
+    // Testing "token required" message given upon missing token
     it('"token required" message given on missing token', async () => {
       const response = await request(server).get('/api/jokes')
       expect(response.text + '').toMatch(/token required/);
